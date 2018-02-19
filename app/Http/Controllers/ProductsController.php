@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Product;
 class ProductsController extends Controller
 {
     /**
@@ -11,9 +11,11 @@ class ProductsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+     // Page to display all or part of the product
     public function index()
     {
-        //
+        $products = Product::all();
+        return view('products.index')->with('products',$products);
     }
 
     /**
@@ -21,9 +23,11 @@ class ProductsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    // controller to get the view to add/create product
     public function create()
     {
-        //
+        return view('products.create');
     }
 
     /**
@@ -32,9 +36,27 @@ class ProductsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // controller to handle the request before adding product to the database
     public function store(Request $request)
     {
-        //
+      // Validate
+      $this->validate($request,[
+        'productName' => 'required'
+      ]);
+      //add
+      $product = new Product();
+      $product->name = $request->input('productName');
+      $product->description = $request->input('productDescription');
+      $product->category = $request->input('productCategory');
+      // net to think of mechanism to include the required item
+      $product->requiredItem = "primary";
+      $product->productID = $request->input('productID');
+      $product->save();
+
+
+      // redirect
+
+        return redirect('/products') ;
     }
 
     /**
