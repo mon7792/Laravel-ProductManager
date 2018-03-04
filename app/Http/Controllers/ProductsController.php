@@ -52,11 +52,8 @@ class ProductsController extends Controller
       $product->requiredItem = "primary";
       $product->productID = $request->input('productID');
       $product->save();
-
-
-      // redirect
-
-        return redirect('/products') ;
+      //redirect
+      return redirect('/products') ;
     }
 
     /**
@@ -78,7 +75,8 @@ class ProductsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $product = Product::find($id);
+        return view('products.edit')->with('product', $product);
     }
 
     /**
@@ -90,7 +88,19 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+      $this->validate($request,[
+        'productName' => 'required'
+      ]);
+      //add
+      $product = Product::find($id);
+      $product->name = $request->input('productName');
+      $product->description = $request->input('productDescription');
+      $product->category = $request->input('productCategory');
+      // net to think of mechanism to include the required item
+      $product->requiredItem = "primary";
+      $product->productID = $request->input('productID');
+      $product->save();
+      return redirect('/products') ;
     }
 
     /**
@@ -101,6 +111,9 @@ class ProductsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        //delete Products
+        $product = Product::find($id);
+        $product->delete();
+        return redirect('/products');
     }
 }
