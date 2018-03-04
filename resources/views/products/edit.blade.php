@@ -24,10 +24,9 @@
 				<div class="form-group">
 					<label for="category">Category:</label>
 					<select class="form-control" id="productCategory" name="productCategory">
-						<option value="category1">category1</option>
-						<option value="category2">category2</option>
-						<option value="category3">category3</option>
-						<option value="category4">category4</option>
+						@foreach($category as $cat)
+						<option @if($cat->category == $categorySelected) selected @endif>{{ $cat->category }}</option>
+						@endforeach
 					</select>
 				</div>
 

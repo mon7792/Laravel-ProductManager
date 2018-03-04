@@ -20,7 +20,7 @@
         <th>ID</th>
         <th>Name</th>
         <th>Description</th>
-        <th></th>
+        <th>Category</th>
         <th></th>
       </tr>
     </thead>
@@ -30,6 +30,7 @@
           <td>{{$product-> productID}}</td>
           <td>{{$product-> name}}</td>
           <td>{{$product-> description}}</td>
+          <td>{{$product->categories->category}}</td>
           <td><a href="{{ url('products/'.$product->id.'/edit')}}" class="btn btn-success">edit</a>
               <!-- Delete button -->
               <form method="POST" action="{{ url('products/'.$product->id)}}" style="float:right;">

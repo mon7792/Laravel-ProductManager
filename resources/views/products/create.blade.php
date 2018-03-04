@@ -22,10 +22,9 @@
 				<div class="form-group">
 					<label for="category">Category:</label>
 					<select class="form-control" id="productCategory" name="productCategory">
-						<option>category1</option>
-						<option>category2</option>
-						<option>category3</option>
-						<option>category4</option>
+						@foreach($category as $cat)
+						<option>{{ $cat->category }}</option>
+						@endforeach
 					</select>
 				</div>
 

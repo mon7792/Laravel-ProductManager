@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Product;
+use App\Category;
 class ProductsController extends Controller
 {
     /**
@@ -15,7 +16,7 @@ class ProductsController extends Controller
     public function index()
     {
         $products = Product::all();
-        return view('products.index')->with('products',$products);
+        return view('products.index', compact('products'));
     }
 
     /**
@@ -27,7 +28,8 @@ class ProductsController extends Controller
     // controller to get the view to add/create product
     public function create()
     {
-        return view('products.create');
+        $category = Category::all();
+        return view('products.create')->with('category',$category);
     }
 
     /**
@@ -43,11 +45,14 @@ class ProductsController extends Controller
       $this->validate($request,[
         'productName' => 'required'
       ]);
+
+      // deal with the product category and change it to number
+      $productCategoryId = Category::where('category',$request->input('productCategory'))->get();
       //add
       $product = new Product();
       $product->name = $request->input('productName');
       $product->description = $request->input('productDescription');
-      $product->category = $request->input('productCategory');
+      $product->category = $productCategoryId[0]->id;
       // net to think of mechanism to include the required item
       $product->requiredItem = "primary";
       $product->productID = $request->input('productID');
@@ -75,8 +80,11 @@ class ProductsController extends Controller
      */
     public function edit($id)
     {
+        $category = Category::all();
         $product = Product::find($id);
-        return view('products.edit')->with('product', $product);
+        // categorySelected: is to find the category a particular product belongs to
+        $categorySelected = Category::find($product->category)->category;
+        return view('products.edit', compact('product','category', 'categorySelected'));
     }
 
     /**
@@ -91,11 +99,13 @@ class ProductsController extends Controller
       $this->validate($request,[
         'productName' => 'required'
       ]);
+      // deal with the product category and change it to number
+      $productCategoryId = Category::where('category',$request->input('productCategory'))->get();
       //add
       $product = Product::find($id);
       $product->name = $request->input('productName');
       $product->description = $request->input('productDescription');
-      $product->category = $request->input('productCategory');
+      $product->category = $productCategoryId[0]->id;
       // net to think of mechanism to include the required item
       $product->requiredItem = "primary";
       $product->productID = $request->input('productID');
