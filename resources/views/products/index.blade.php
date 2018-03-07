@@ -28,7 +28,7 @@
       @foreach($products as $product)
         <tr>
           <td>{{$product-> productID}}</td>
-          <td>{{$product-> name}}</td>
+          <td><a href="{{ url('products/'.$product->id)}}">{{$product-> name}} </a></td>
           <td>{{$product-> description}}</td>
           <td>{{$product->categories->category}}</td>
           <td><a href="{{ url('products/'.$product->id.'/edit')}}" class="btn btn-success">edit</a>
@@ -39,6 +39,7 @@
                 <button class="btn btn-danger" type="submit" value="Delete">Delete</button>
               </form>
           </td>
+
         </tr>
       @endforeach
     </tbody>

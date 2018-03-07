@@ -4,7 +4,7 @@
 		<div class="col-md-offset-3 col-md-6">
 			<div class="well">
 				<h2>Add Product</h2>
-			  <form method="POST" action="{{ url('products')}}">
+			  <form method="POST" action="{{ url('products')}}" enctype="multipart/form-data">
 				<!-- Name of the product-->
         {{ csrf_field() }}
 				<div class="form-group">
@@ -41,7 +41,9 @@
 				  <label for="productid">Product ID:</label>
 				  <input type="text" class="form-control" id="productID" placeholder="Enter product id" name="productID">
 				</div>
-
+				<div class="form-group">
+  				<input type="file" name="cover_image" id="file">
+				</div>
 				<!-- Submit Button-->
 				<button type="submit" class="btn btn-default">Submit</button>
 			  </form>

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Product;
 use App\Category;
+use App\ProductImages;
 class ProductsController extends Controller
 {
     /**
@@ -43,8 +45,31 @@ class ProductsController extends Controller
     {
       // Validate
       $this->validate($request,[
-        'productName' => 'required'
+        'productName' => 'required',
+        'cover_image' => 'image|nullable|max:1999'
       ]);
+      //
+      if($request->hasFile('cover_image'))
+      {
+        //get file name with extension
+        $filenameWithExt = $request->file('cover_image')->getClientOriginalName();
+        //get just filename
+        $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+        //get just ext
+        $extension = $request->file('cover_image')->getClientOriginalExtension();
+        //Filename to Store
+        $fileNameToStore = $filename.'_'.time().'.'.$extension;
+        //Upload image
+        $path = $request->file('cover_image')->storeAs('public/cover_images',$fileNameToStore);
+      }
+      else {
+        $fileNameToStore = 'noimage.jpg';
+      }
+
+
+
+
+
 
       // deal with the product category and change it to number
       $productCategoryId = Category::where('category',$request->input('productCategory'))->get();
@@ -57,6 +82,11 @@ class ProductsController extends Controller
       $product->requiredItem = "primary";
       $product->productID = $request->input('productID');
       $product->save();
+      //
+      $productImages = new productImages();
+      $productImages->product_id =  $request->input('productID');
+      $productImages->cover_image = $fileNameToStore;
+      $productImages->save();
       //redirect
       return redirect('/products') ;
     }
@@ -69,7 +99,10 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        //
+      //return $id;
+      $product = Product::find($id);
+      $productImage = ProductImages::where('product_id', '=', $product->productID)->firstOrFail();
+      return view('products.show', compact('product','productImage'));
     }
 
     /**
@@ -97,8 +130,29 @@ class ProductsController extends Controller
     public function update(Request $request, $id)
     {
       $this->validate($request,[
-        'productName' => 'required'
+        'productName' => 'required',
+
       ]);
+      // Deal with images
+      //Handle the File Upload
+      if($request->hasFile('cover_image'))
+      {
+        //get file name with extension
+          $filenameWithExt = $request->file('cover_image')->getClientOriginalName();
+          //get just filename
+          $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+          //get just ext
+          $extension = $request->file('cover_image')->getClientOriginalExtension();
+          //Filename to Store
+          $fileNameToStore = $filename.'_'.time().'.'.$extension;
+          //Upload image
+          $path = $request->file('cover_image')->storeAs('public/cover_images',$fileNameToStore);
+      }
+
+
+
+
+
       // deal with the product category and change it to number
       $productCategoryId = Category::where('category',$request->input('productCategory'))->get();
       //add
@@ -110,6 +164,18 @@ class ProductsController extends Controller
       $product->requiredItem = "primary";
       $product->productID = $request->input('productID');
       $product->save();
+
+      #Update the product of the Image
+      $productImage = ProductImages::where('product_id',$request->input('productID'))->firstOrFail();
+      // return $productImage;
+      // handling product database
+      if($request->hasFile('cover_image'))
+      {
+       $productImage->cover_image = $fileNameToStore;
+      }
+      $productImage->save();
+      // here handle for the photo update if the cover_image changes
+
       return redirect('/products') ;
     }
 
@@ -123,7 +189,13 @@ class ProductsController extends Controller
     {
         //delete Products
         $product = Product::find($id);
+        $productImage = ProductImages::where('product_id',$product->productID)->firstOrFail();
         $product->delete();
+        if($productImage->cover_image != 'noimage.jpg')
+        {
+        Storage::delete('public/cover_images/'.$productImage->cover_image);
+        }
+        $productImage->delete();
         return redirect('/products');
     }
 }
